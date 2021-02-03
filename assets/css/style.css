@@ -3,8 +3,6 @@
   padding: 0;
   box-sizing: border-box;
 }
-body {
-}
 
 .container {
   margin: 0 auto;
@@ -52,11 +50,25 @@ section {
   width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
+  /* flex-wrap: wrap;
+  justify-content: center; */
+}
+
+.movie {
+  margin-bottom: 3rem;
+}
+
+.movie h2 {
+  text-align: center;
+  margin-bottom: 0.3rem;
+  font-size: 2rem;
 }
 
 section img {
   width: 300px;
   margin: 0 3px;
+  /* margin: 0.75rem; */
+  transition: all 0.3s;
 }
 
 img:hover {
@@ -67,11 +79,29 @@ img:hover {
 }
 
 .content {
-  border: 1px solid red;
-  height: 15rem;
   display: none;
+  margin-top: 2rem;
+  margin-bottom: 5rem;
+  border: 1px solid lightblue;
+  padding: 1rem 0.75rem;
+}
+
+.content div {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
 }
 
 .content-display {
   display: block;
+}
+
+#content-close {
+  cursor: pointer;
+}
+
+iframe {
+  border: 0;
+  margin: 0.75rem;
+  align-items: center;
 }

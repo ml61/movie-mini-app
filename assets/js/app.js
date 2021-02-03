@@ -1,50 +1,44 @@
 const inputElement = document.querySelector("#inputValue");
 const buttonElement = document.querySelector("#search");
-const API_KEY = "4e1ae7b7696237121285525a25ba8e49";
 const movieSearchable = document.querySelector("#movie-searchable");
-
-const url =
-  "https://api.themoviedb.org/3/search/movie?api_key=4e1ae7b7696237121285525a25ba8e49";
-
-const imageURL = "https://image.tmdb.org/t/p/w500";
+const moviesContainer = document.querySelector("#moviesContainer");
 
 buttonElement.addEventListener("click", function (e) {
   e.preventDefault();
   const value = inputElement.value;
-  const newURL = url + `&query=${value}`;
-  movieRequest(newURL);
+
+  searchMovie(value);
   inputElement.value = "";
 });
 
-async function movieRequest(url) {
-  try {
-    let response = await fetch(url);
-    let data = await response.json();
-    //data is object with result array which has movie objects
-    renderSearchMovie(data);
-  } catch (err) {
-    console.error(`Error, ${err}`);
-  }
+function handleError(err) {
+  console.error("Error: ", err);
 }
 
 function renderSearchMovie(data) {
   movieSearchable.innerHTML = "";
   const movies = data.results;
-  console.log(movies);
   const movieBlock = createMovieContainer(movies);
   movieSearchable.appendChild(movieBlock);
 }
 
-function createMovieContainer(movies) {
+function renderMovies(data) {
+  const movies = data.results;
+  const movieBlock = createMovieContainer(movies, this.title);
+  moviesContainer.appendChild(movieBlock);
+}
+
+function createMovieContainer(movies, title = "") {
   const movieElement = document.createElement("div");
   movieElement.setAttribute("class", "movie");
 
   const movieTemplate = `
+    <h2>${title}</h2>
     <section class="section">
         ${movieSection(movies)}
     </section>
     <div class="content">
-        <p class="content-close">X</p>
+        <p id="content-close">X</p>
     </div>
     `;
 
@@ -70,7 +64,54 @@ function movieSection(movies) {
 // });
 
 //Event delegation
-movieSearchable.addEventListener("click", function (e) {
+document.addEventListener("click", function (e) {
   const target = e.target;
-  console.log(target.dataset.movieId);
+
+  if (target.tagName.toLowerCase() === "img") {
+    const movieId = target.dataset.movieId;
+    const section = target.parentElement;
+    const content = section.nextElementSibling;
+    content.innerHTML = `<p id="content-close">X</p>`;
+    content.classList.add("content-display");
+
+    addIframe(movieId, content);
+  }
+  if (target.id === "content-close") {
+    const content = target.parentElement;
+    content.classList.remove("content-display");
+  }
 });
+
+function createIframe(video) {
+  const iframe = document.createElement("iframe");
+  iframe.src = `https://www.youtube.com/embed/${video.key}`;
+  iframe.width = 600;
+  iframe.height = 315;
+  iframe.allowFullscreen = true;
+
+  return iframe;
+}
+
+async function addIframe(movieId, content) {
+  path = `/movie/${movieId}/videos`;
+  const url = generateURL(path);
+  //fetch movie videos
+  let videos = await videoRequest(url);
+  const length = videos.length > 2 ? 2 : videos.length;
+  let iframeContainer = document.createElement("div");
+
+  for (let i = 0; i < length; i++) {
+    let video = videos[i];
+    let iframe = createIframe(video);
+    iframeContainer.appendChild(iframe);
+    content.appendChild(iframeContainer);
+  }
+}
+
+async function init() {
+  getUpcomingMovies();
+  getTopRatedMovies();
+  getPopularMovies();
+}
+
+init();
